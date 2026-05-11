@@ -1,0 +1,11 @@
+[
+  {
+    "id": 1,
+    "amount": 6.0,
+    "category": "coffee",
+    "description": "Daily coffee",
+    "start_date": "2026-05-01",
+    "frequency": "daily",
+    "last_applied": null
+  }
+]

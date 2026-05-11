@@ -1,0 +1,11 @@
+{
+  "food": {
+    "amount": 100.0,
+    "period": "monthly",
+    "alert_percent": 75.0
+  },
+  "coffee": {
+    "amount": 100.0,
+    "period": "monthly"
+  }
+}
