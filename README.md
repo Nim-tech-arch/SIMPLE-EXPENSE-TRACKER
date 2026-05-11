@@ -52,12 +52,3 @@ python expense_tracker.py remove 2
 ## Data Storage
 
 Expenses are saved in `expenses.json` located next to `expense_tracker.py`.
-
-## Next steps
-
-You can extend this tracker by adding:
-
-- recurring expenses
-- budgets and alerts
-- more advanced categories or tags
-- a minimal TUI or menu-driven experience
