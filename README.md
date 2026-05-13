@@ -101,9 +101,13 @@ Request body for `POST /expenses`:
 
 ## Data Storage
 
+<<<<<<< HEAD
 Expenses are saved in `expenses.json` next to `expense_tracker.py`.
 Recurring patterns are saved in `recurrings.json` and budgets are saved in `budgets.json`.
 
 ## Notes
 
 This repository is intended as a small full-stack demo with both local JSON-backed persistence and a simple browser-based frontend.
+=======
+Expenses are saved in `expenses.json` located next to `expense_tracker.py`.
+>>>>>>> c5f1da3bf79a565ce8b7b835ee0873bafc0069e7
