@@ -5,10 +5,28 @@ import json
 from datetime import datetime, date, timedelta
 from pathlib import Path
 
+try:
+    from fastapi import FastAPI, HTTPException
+    from fastapi.middleware.cors import CORSMiddleware
+    from fastapi.staticfiles import StaticFiles
+    from fastapi.responses import FileResponse
+    from pydantic import BaseModel
+    import uvicorn
+    WEB_AVAILABLE = True
+except ImportError:
+    WEB_AVAILABLE = False
+
 DATA_FILE = Path(__file__).parent / "expenses.json"
 BUDGET_FILE = Path(__file__).parent / "budgets.json"
 RECURRING_FILE = Path(__file__).parent / "recurrings.json"
 DATE_FORMAT = "%Y-%m-%d"
+
+
+class ExpenseCreate(BaseModel):
+    date: str
+    amount: float
+    category: str
+    description: str
 
 
 def parse_date(date_str):
@@ -783,10 +801,53 @@ def build_parser():
     return parser
 
 
+if WEB_AVAILABLE:
+    app = FastAPI(title="Expense Tracker API")
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # For demo purposes
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    from fastapi.responses import FileResponse
+
+    @app.get("/")
+    def read_root():
+        return FileResponse("index.html")
+
+    app.mount("/static", StaticFiles(directory="."), name="static")
+
+    @app.get("/expenses")
+    def get_expenses():
+        expenses = apply_recurring_expenses()
+        return expenses
+
+    @app.post("/expenses")
+    def create_expense(expense: ExpenseCreate):
+        expenses = load_expenses()
+        entry = {
+            "id": next_id(expenses),
+            "date": expense.date,
+            "amount": round(expense.amount, 2),
+            "category": expense.category.strip(),
+            "description": expense.description.strip(),
+            "created_at": datetime.now().isoformat(timespec="seconds"),
+        }
+        expenses.append(entry)
+        save_expenses(expenses)
+        return entry
+
+
 def main():
     parser = build_parser()
     args = parser.parse_args()
-    if not getattr(args, "command", None):
+    if WEB_AVAILABLE and not getattr(args, "command", None):
+        # Run web server if no command specified
+        uvicorn.run(app, host="0.0.0.0", port=8000)
+    elif not getattr(args, "command", None):
         run_menu()
     else:
         if args.command != "menu":

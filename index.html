@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        form { margin-bottom: 20px; }
+        input, button { margin: 5px; padding: 8px; }
+        #expenses { margin-top: 20px; }
+        #total { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Expense Tracker</h1>
+    
+    <form id="expenseForm">
+        <input type="date" id="date" required>
+        <input type="number" id="amount" step="0.01" placeholder="Amount" required>
+        <input type="text" id="category" placeholder="Category" required>
+        <input type="text" id="description" placeholder="Description">
+        <button type="submit">Add Expense</button>
+    </form>
+    
+    <button id="loadBtn">Load Expenses</button>
+    
+    <div id="total">Total: $0.00</div>
+    
+    <div id="expenses"></div>
+    
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        
+        document.getElementById('expenseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const date = document.getElementById('date').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const category = document.getElementById('category').value;
+            const description = document.getElementById('description').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/expenses`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ date, amount, category, description })
+                });
+                if (response.ok) {
+                    alert('Expense added!');
+                    document.getElementById('expenseForm').reset();
+                    loadExpenses();
+                } else {
+                    alert('Error adding expense');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error adding expense');
+            }
+        });
+        
+        document.getElementById('loadBtn').addEventListener('click', loadExpenses);
+        
+        async function loadExpenses() {
+            try {
+                const response = await fetch(`${API_BASE}/expenses`);
+                const expenses = await response.json();
+                displayExpenses(expenses);
+                calculateTotal(expenses);
+            } catch (error) {
+                console.error('Error loading expenses:', error);
+            }
+        }
+        
+        function displayExpenses(expenses) {
+            const container = document.getElementById('expenses');
+            container.innerHTML = '<h2>Expenses</h2>';
+            if (expenses.length === 0) {
+                container.innerHTML += '<p>No expenses found.</p>';
+                return;
+            }
+            const table = document.createElement('table');
+            table.innerHTML = `
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                </tr>
+            `;
+            expenses.forEach(expense => {
+                const row = table.insertRow();
+                row.insertCell().textContent = expense.id;
+                row.insertCell().textContent = expense.date;
+                row.insertCell().textContent = `$${expense.amount.toFixed(2)}`;
+                row.insertCell().textContent = expense.category;
+                row.insertCell().textContent = expense.description;
+            });
+            container.appendChild(table);
+        }
+        
+        function calculateTotal(expenses) {
+            const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            document.getElementById('total').textContent = `Total: $${total.toFixed(2)}`;
+        }
+        
+        // Load expenses on page load
+        loadExpenses();
+    </script>
+</body>
+</html>

@@ -1,63 +1,109 @@
-# Simple Expense Tracker CLI
+# Simple Expense Tracker
 
-This repository contains a simple command-line expense tracker written in Python.
-It stores expenses in a local JSON file and supports adding, listing, summarizing, exporting, and removing expenses.
+A small expense tracker with both a CLI interface and a minimal web frontend.
+Expenses are stored in `expenses.json`, and the project also supports budgets and recurring expenses.
 
 ## Requirements
 
 - Python 3.8+
 
-## Usage
+## Installation
 
-Run the tracker from the workspace folder:
+Install the required Python packages:
 
 ```bash
-python expense_tracker.py            # start the interactive menu
-python expense_tracker.py menu       # start the interactive menu
-python expense_tracker.py add --amount 15.50 --category food --description "Lunch" --date 2026-05-11
-python expense_tracker.py list --start 2026-05-01 --end 2026-05-11
+pip install -r requirements.txt
+```
+
+## CLI Usage
+
+Start the interactive CLI menu:
+
+```bash
+python expense_tracker.py
+```
+
+Use subcommands directly:
+
+```bash
+python expense_tracker.py add --amount 10.00 --category food --description lunch --date 2026-05-11
+python expense_tracker.py list
 python expense_tracker.py summary --start 2026-05-01 --end 2026-05-11
+python expense_tracker.py export --output report.csv --start 2026-05-01 --end 2026-05-11
+python expense_tracker.py remove 2
+```
+
+Budget commands:
+
+```bash
 python expense_tracker.py budget set --category food --amount 300 --period monthly --alert-percent 80
 python expense_tracker.py budget list
 python expense_tracker.py budget status --start 2026-05-01 --end 2026-05-11
 python expense_tracker.py budget alerts --start 2026-05-01 --end 2026-05-11
+```
+
+Recurring expense commands:
+
+```bash
 python expense_tracker.py recurring add --amount 29.99 --category subscription --description "Streaming" --start-date 2026-05-15 --frequency monthly
 python expense_tracker.py recurring list
 python expense_tracker.py recurring edit 1 --amount 34.99 --frequency yearly
 python expense_tracker.py recurring reset --id 1
 python expense_tracker.py recurring reset --all
 python expense_tracker.py recurring run
-python expense_tracker.py export --output report.csv --start 2026-05-01 --end 2026-05-11
-python expense_tracker.py remove 2
 ```
 
-## Commands
+## Web Usage
 
-- `menu`: Start the interactive, menu-driven tracker.
-- `add`: Add a new expense.
-- `list`: Display stored expenses, optionally filtered by date range or category.
-- `summary`: Show totals, average, and breakdowns by category and date.
-- `budget set`: Assign a spending budget to a category, including `--period monthly`.
-- `budget list`: Show category budgets.
-- `budget status`: Compare filtered spending with budgets and monthly budget periods.
-- `budget alerts`: Show budgets that are near or over the alert threshold.
-- `recurring add`: Add a recurring expense pattern.
-- `recurring list`: Show recurring expense definitions.
-- `recurring edit`: Update an existing recurring expense.
-- `recurring reset`: Remove generated recurring entries and reset recurrence progress.
-- `recurring run`: Apply due recurring expenses to the expense history.
-- `export`: Export filtered expenses to CSV.
-- `remove`: Remove an expense by ID.
+Run the web server:
+
+```bash
+python expense_tracker.py
+```
+
+Then open:
+
+```bash
+http://localhost:8000
+```
+
+The web interface includes:
+- Add expense form
+- Load expenses button
+- Dynamic total display
+
+## API
+
+- `GET /expenses` — retrieve all stored expenses
+- `POST /expenses` — add a new expense
+
+Request body for `POST /expenses`:
+
+```json
+{
+  "date": "2026-05-13",
+  "amount": 12.50,
+  "category": "food",
+  "description": "Lunch"
+}
+```
+
+## Commands Overview
+
+- `menu` — start the interactive menu
+- `add` — add a new expense
+- `list` — list stored expenses
+- `summary` — show total and breakdowns
+- `export` — export expenses to CSV
+- `remove` — remove an expense by ID
+- `budget set` / `budget list` / `budget status` / `budget alerts`
+- `recurring add` / `recurring list` / `recurring edit` / `recurring reset` / `recurring run`
 
 ## Data Storage
 
-Expenses are saved in `expenses.json` located next to `expense_tracker.py`.
+Expenses are saved in `expenses.json` next to `expense_tracker.py`.
+Recurring patterns are saved in `recurrings.json` and budgets are saved in `budgets.json`.
 
-## Next steps
+## Notes
 
-You can extend this tracker by adding:
-
-- recurring expenses
-- budgets and alerts
-- more advanced categories or tags
-- a minimal TUI or menu-driven experience
+This repository is intended as a small full-stack demo with both local JSON-backed persistence and a simple browser-based frontend.
